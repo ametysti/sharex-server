@@ -9,8 +9,10 @@ services:
       - 127.0.0.1:43423:3000
     restart: on-failure
     volumes:
-      - ./files:/app/files
+      # Recommended to have files stored in /var/www, you are going to need a web server to serve all files. i.e Caddy
+      - /var/www/sharex/files:/app/files
     environment:
+      - URL=1433.lol/files
       - GOCACHE=/root/.cache/go-build
     healthcheck:
       test: ["CMD", "curl", "-f", "http://sharex-go:3000/"]
