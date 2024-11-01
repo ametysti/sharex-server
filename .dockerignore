@@ -1,7 +1,3 @@
-# Ignore Go modules and dependencies
-go.sum
-go.mod
-
 # Ignore Git and environment files
 .git
 .gitignore

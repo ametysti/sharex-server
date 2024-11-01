@@ -59,10 +59,6 @@ func main() {
 			return
 		}
 
-		if strings.HasPrefix(r.Header.Get("Content-Type"), "video/") {
-
-		}
-
 		if err != nil {
 			fmt.Println(err)
 			http.Error(w, "Failed parsing multipart form", 500)
@@ -70,21 +66,20 @@ func main() {
 		}
 
 		file, header, err := r.FormFile("file")
-
 		if err != nil {
 			fmt.Println(err)
-			http.Error(w, "Failed FormFile", 500)
+			http.Error(w, "did not receive any file. note that url shorteners are unsupported", 406)
 			return
 		}
+		defer file.Close()
 
-		fileLocation := fmt.Sprintf("%s", header.Filename)
+		randomNumber := rand.Intn(4-1+1) + 1
 
-		println(header.Filename)
-
-		byteContainer, err := io.ReadAll(file)
+		fileLocation := fmt.Sprintf("%s.%s", generateRandomString(randomNumber), header.Filename)
 
 		slog.Debug(fmt.Sprintf("writing file to files/%s", fileLocation))
-		err = os.WriteFile("files/"+fileLocation, byteContainer, 0444)
+		dst, err := os.Create("files/" + fileLocation)
+		io.Copy(dst, file)
 
 		if err != nil {
 			slog.Error(err.Error())
@@ -94,7 +89,7 @@ func main() {
 			return
 		}
 
-		slog.Debug(fmt.Sprintf("sending file output link to client: https://i.1433.lol/%s", fileLocation))
+		slog.Debug(fmt.Sprintf("sending file output link to client: https://%s/%s", os.Getenv("URL"), fileLocation))
 		w.Write([]byte(fmt.Sprintf("https://%s/%s", os.Getenv("URL"), fileLocation)))
 	})
 

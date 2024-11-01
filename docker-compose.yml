@@ -6,22 +6,16 @@ services:
     container_name: sharex-go
     ports:
       # If you are using a reverse proxy, i dont recommend exposing this port to public. Not critical stuff, but just a basic safety measurement
-      - 127.0.0.1:3000:3000
+      - 127.0.0.1:43423:3000
     restart: on-failure
     volumes:
-      - files-data:/app/files
+      - ./files:/app/files
     environment:
       - GOCACHE=/root/.cache/go-build
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/incidents"]
+      test: ["CMD", "curl", "-f", "http://sharex-go:3000/"]
       interval: 30s
       timeout: 10s
       retries: 3
     mem_limit: 1024mb
     cpus: '2'
-    networks:
-      - peto-net
-
-networks:
-  peto-net:
-    driver: bridge
